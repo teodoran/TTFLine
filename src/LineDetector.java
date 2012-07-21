@@ -1,7 +1,7 @@
 
 public class LineDetector {
 
-	public int getStraigthLineValue(int[] edgePointFrom, int[] edgePointTo, int[][] intArray) {
+	public int getStraightLineValue(int[] edgePointFrom, int[] edgePointTo, int[][] intArray) {
 		int lineSum = 0;
 		int[] diffPoint = getDiffPoint(edgePointFrom, edgePointTo);
 		
@@ -9,34 +9,26 @@ public class LineDetector {
 			return sumArray(intArray[edgePointFrom[0]]);
 		}
 		
-		double fraction = getSlope(diffPoint[0], diffPoint[1]);
-		
-		System.out.println(fraction);
-		
-		if (fraction == -1) {
+		if (diffPoint[1] == 0) {
 			for (int[] line:intArray) {
 				lineSum += line[edgePointFrom[1]];
 			}
 			return lineSum;
 		}
 		
-		int i0 = 0;
-		int i1 = intArray.length;
-		int j0 = 0;
-		int j1 = intArray[0].length;
+		double fraction = getSlope(diffPoint[0], diffPoint[1]);
 		
-		/*
-		int i0 = edgePointFrom[0];
-		int i1 = intArray.length;
-		int j0 = edgePointFrom[1];
-		int j1 = intArray[0].length;
-		*/
+		int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
+		
+		int i0 = iteratorBounds[0];
+		int i1 = iteratorBounds[1];
+		int j0 = iteratorBounds[2];
+		int j1 = iteratorBounds[3];
 		
 		for (int i=i0; i<i1; i++) {
 			for (int j=j0; j<j1; j++) {
-				if (j == Math.round(fraction*i)){
+				if (isOnLine(i, j, fraction, edgePointFrom[1])){
 					lineSum += intArray[i][j];
-					System.out.println(intArray[i][j]);
 				}
 			}
 		}
@@ -44,13 +36,7 @@ public class LineDetector {
 	}
 	
 	private double getSlope(int x, int y) {
-		if (x == 0 && y== 0) {
-			return 1;
-		} else if (y == 0) {
-			return -1;
-		} else {
-			return y/x;
-		}
+		return (double)y/(double)x;
 	}
 	
 	private int[] getDiffPoint(int[] pointFrom, int[] pointTo) {
@@ -60,12 +46,25 @@ public class LineDetector {
 		return point;
 	}
 	
+	public int[] getIteratorBounds(int[] pointFrom, int[] pointTo) {
+		int i0 = Math.min(pointFrom[0], pointTo[0]) ;
+		int i1 = Math.max(pointFrom[0], pointTo[0])+1;
+		int j0 = Math.min(pointFrom[1], pointTo[1]);
+		int j1 = Math.max(pointFrom[1], pointTo[1])+1;
+		int[] points = {i0, i1, j0, j1};
+		return points;
+	}
+	
 	private int sumArray(int[] array) {
 		int sum = 0;
 		for (int i:array) {
 			sum += i;
 		}
 		return sum;
+	}
+
+	public boolean isOnLine(int i, int j, double fraction, int constant) {
+		return (j == (int)(Math.round(fraction*i)+constant));
 	}
 
 }
