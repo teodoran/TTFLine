@@ -49,60 +49,6 @@ public class LineDetectorTest {
 		assertArrayEquals(expecteds, actuals);
 	}
 	
-	//////////////////
-	//Is on line tests
-	@Test
-	public void test_isOnLine_0(){
-		LineDetector line = new LineDetector();
-		
-		double fraction = (double)1/(double)3;
-		int constant = 1;
-				
-		int i0 = 0;
-		int j0 = 1;
-		
-		assertTrue(line.isOnLine(i0, j0, fraction, constant));
-	}
-	
-	@Test
-	public void test_isOnLine_1(){
-		LineDetector line = new LineDetector();
-		
-		double fraction = (double)1/(double)3;
-		int constant = 1;
-		
-		int i1 = 1;
-		int j1 = 1;
-
-		assertTrue(line.isOnLine(i1, j1, fraction, constant));
-	}
-	
-	@Test
-	public void test_isOnLine_2(){
-		LineDetector line = new LineDetector();
-		
-		double fraction = (double)1/(double)3;
-		int constant = 1;
-		
-		int i2 = 2;
-		int j2 = 2;
-
-		assertTrue(line.isOnLine(i2, j2, fraction, constant));
-	}
-	
-	@Test
-	public void test_isOnLine_3(){
-		LineDetector line = new LineDetector();
-		
-		double fraction = (double)1/(double)3;
-		int constant = 1;
-		
-		int i3 = 3;
-		int j3 = 2;
-
-		assertTrue(line.isOnLine(i3, j3, fraction, constant));
-	}
-	
 	/////////////////////////
 	//Get straight line tests
 	@Test
@@ -228,13 +174,89 @@ public class LineDetectorTest {
 							 {0, 0, 1, 1},
 							 {0, 0, 0, 0}};
 		
-		int[] testFrom = {0, 2};
-		int[] testTo = {3, 1};
+		int[] testFrom = {1, 0};
+		int[] testTo = {2, 3};
+		
+		int actual = line.getStraightLineValue(testFrom, testTo, testArray);
+		
+		assertEquals(4, actual);
+	}
+	
+	@Test
+	public void test_getStraightLineValue_for_skewed_up() {
+		LineDetector line = new LineDetector();
+		
+		int[][] testArray = {{0, 0, 0, 0},
+							 {0, 0, 1, 1},
+							 {1, 1, 0, 0},
+							 {0, 0, 0, 0}};
+		
+		int[] testFrom = {2, 0};
+		int[] testTo = {1, 3};
 		
 		int actual = line.getStraightLineValue(testFrom, testTo, testArray);
 		
 		assertEquals(4, actual);
 	}
 
+	@Test
+	public void test_getStraightLineValue_for_big_final_value_1() {
+		LineDetector line = new LineDetector();
+		
+		int[][] testArray = {{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}};
+		
+		int[] testFrom = {0, 3};
+		int[] testTo = {6, 6};
+		
+		int actual = line.getStraightLineValue(testFrom, testTo, testArray);
+		
+		assertEquals(7, actual);
+	}
+	
+	@Test
+	public void test_getStraightLineValue_for_big_final_value_2() {
+		LineDetector line = new LineDetector();
+		
+		int[][] testArray = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0}};
+		
+		int[] testFrom = {2, 0};
+		int[] testTo = {6, 8};
+		
+		int actual = line.getStraightLineValue(testFrom, testTo, testArray);
+		
+		assertEquals(9, actual);
+	}
+	
+	@Test
+	public void test_getStraightLineValue_for_big_final_value_3() {
+		LineDetector line = new LineDetector();
+		
+		int[][] testArray = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+							 {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+							 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+		
+		int[] testFrom = {5, 0};
+		int[] testTo = {0, 10};
+		
+		int actual = line.getStraightLineValue(testFrom, testTo, testArray);
+		
+		assertEquals(11, actual);
+	}
 
 }

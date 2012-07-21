@@ -16,20 +16,27 @@ public class LineDetector {
 			return lineSum;
 		}
 		
-		double fraction = getSlope(diffPoint[0], diffPoint[1]);
-		
-		int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
-		
-		int i0 = iteratorBounds[0];
-		int i1 = iteratorBounds[1];
-		int j0 = iteratorBounds[2];
-		int j1 = iteratorBounds[3];
-		
-		for (int i=i0; i<i1; i++) {
+		if (diffPoint[0] > diffPoint[1]) {
+			double fraction = getSlope(diffPoint[0], diffPoint[1]);
+			
+			int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
+			
+			int i0 = iteratorBounds[0];
+			int i1 = iteratorBounds[1];
+			
+			for (int i=i0; i<i1; i++) {
+					lineSum += intArray[i][lineFunction(i, fraction, edgePointFrom[1])];
+			}
+		} else {
+			double fraction = getSlope(diffPoint[1], diffPoint[0]);
+			
+			int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
+			
+			int j0 = iteratorBounds[2];
+			int j1 = iteratorBounds[3];
+			
 			for (int j=j0; j<j1; j++) {
-				if (isOnLine(i, j, fraction, edgePointFrom[1])){
-					lineSum += intArray[i][j];
-				}
+					lineSum += intArray[lineFunction(j, fraction, edgePointFrom[0])][j];
 			}
 		}
 		return lineSum;
@@ -62,9 +69,9 @@ public class LineDetector {
 		}
 		return sum;
 	}
-
-	public boolean isOnLine(int i, int j, double fraction, int constant) {
-		return (j == (int)(Math.round(fraction*i)+constant));
+	
+	public int lineFunction(int i, double fraction, int constant) {
+		return (int)(Math.round(fraction*i)+constant);
 	}
 
 }
