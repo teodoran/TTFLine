@@ -1,77 +1,169 @@
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class LineDetector {
 
-	public int getStraightLineValue(int[] edgePointFrom, int[] edgePointTo, int[][] intArray) {
-		int lineSum = 0;
-		int[] diffPoint = getDiffPoint(edgePointFrom, edgePointTo);
-		
-		if (diffPoint[0] == 0) {
-			return sumArray(intArray[edgePointFrom[0]]);
+	public ArrayList<int[]> getCandidateLines(int[][] edgeArray, int threshold) {
+		ArrayList<int[]> candidateLines = new ArrayList<int[]>();
+
+		int height = edgeArray.length;
+		int width = edgeArray[0].length;
+
+		// top iteration
+		for (int n = 0; n < width; n++) {
+			int[] edgePointFrom = { 0, n };
+			candidateLines.addAll(getCandidatesForSide(edgePointFrom,
+					edgeArray, width, height, threshold, false, true, true,
+					true));
 		}
-		
-		if (diffPoint[1] == 0) {
-			for (int[] line:intArray) {
-				lineSum += line[edgePointFrom[1]];
-			}
-			return lineSum;
+
+		// right iteration
+		for (int n = 0; n < height; n++) {
+			int[] edgePointFrom = { n, width - 1 };
+			candidateLines.addAll(getCandidatesForSide(edgePointFrom,
+					edgeArray, width, height, threshold, false, false, true,
+					true));
 		}
-		
-		if (diffPoint[0] > diffPoint[1]) {
-			double fraction = getSlope(diffPoint[0], diffPoint[1]);
-			
-			int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
-			
-			int i0 = iteratorBounds[0];
-			int i1 = iteratorBounds[1];
-			
-			for (int i=i0; i<i1; i++) {
-					lineSum += intArray[i][lineFunction(i, fraction, edgePointFrom[1])];
-			}
-		} else {
-			double fraction = getSlope(diffPoint[1], diffPoint[0]);
-			
-			int[] iteratorBounds = getIteratorBounds(edgePointFrom, edgePointTo);
-			
-			int j0 = iteratorBounds[2];
-			int j1 = iteratorBounds[3];
-			
-			for (int j=j0; j<j1; j++) {
-					lineSum += intArray[lineFunction(j, fraction, edgePointFrom[0])][j];
+
+		// bottom iteration
+		for (int n = 0; n < width; n++) {
+			int[] edgePointFrom = { height - 1, n };
+			candidateLines.addAll(getCandidatesForSide(edgePointFrom,
+					edgeArray, width, height, threshold, false, false, false,
+					true));
+		}
+
+		return new ArrayList<int[]>(new HashSet<int[]>(candidateLines));
+	}
+
+	public ArrayList<int[]> getCandidatesForSide(int[] edgePointFrom,
+			int[][] edgeArray, int width, int height, int threshold,
+			boolean doTop, boolean doRight, boolean doBottom, boolean doLeft) {
+		ArrayList<int[]> candidateLinesForSide = new ArrayList<int[]>();
+
+		if (doTop) {
+			for (int n = 0; n < width; n++) {
+				int[] edgePointTo = { 0, n };
+				int[] line = {
+						edgePointFrom[0],
+						edgePointFrom[1],
+						edgePointTo[0],
+						edgePointTo[1],
+						getStraightLineValue(edgePointFrom, edgePointTo,
+								edgeArray) };
+
+				if (line[4] >= threshold) {
+					candidateLinesForSide.add(line);
+				}
 			}
 		}
-		return lineSum;
+		if (doRight) {
+			for (int n = 0; n < height; n++) {
+				int[] edgePointTo = { n, width - 1 };
+				int[] line = {
+						edgePointFrom[0],
+						edgePointFrom[1],
+						edgePointTo[0],
+						edgePointTo[1],
+						getStraightLineValue(edgePointFrom, edgePointTo,
+								edgeArray) };
+
+				if (line[4] >= threshold) {
+					candidateLinesForSide.add(line);
+				}
+			}
+		}
+		if (doBottom) {
+			for (int n = 0; n < width; n++) {
+				int[] edgePointTo = { height - 1, n };
+				int[] line = {
+						edgePointFrom[0],
+						edgePointFrom[1],
+						edgePointTo[0],
+						edgePointTo[1],
+						getStraightLineValue(edgePointFrom, edgePointTo,
+								edgeArray) };
+
+				if (line[4] >= threshold) {
+					candidateLinesForSide.add(line);
+				}
+			}
+		}
+		if (doLeft) {
+			for (int n = 0; n < height; n++) {
+				int[] edgePointTo = { n, 0 };
+				int[] line = {
+						edgePointFrom[0],
+						edgePointFrom[1],
+						edgePointTo[0],
+						edgePointTo[1],
+						getStraightLineValue(edgePointFrom, edgePointTo,
+								edgeArray) };
+
+				if (line[4] >= threshold) {
+					candidateLinesForSide.add(line);
+				}
+			}
+		}
+
+		return candidateLinesForSide;
 	}
-	
-	private double getSlope(int x, int y) {
-		return (double)y/(double)x;
+
+	public int getStraightLineValue(int[] edgePointFrom, int[] edgePointTo,
+			int[][] intArray) {
+		return getLineSum(intArray, edgePointFrom[0], edgePointFrom[1],
+				edgePointTo[0], edgePointTo[1]);
 	}
-	
-	private int[] getDiffPoint(int[] pointFrom, int[] pointTo) {
-		int diffX = pointTo[0]-pointFrom[0];
-		int diffY = pointTo[1]-pointFrom[1];
-		int[] point = {diffX, diffY};
-		return point;
-	}
-	
-	public int[] getIteratorBounds(int[] pointFrom, int[] pointTo) {
-		int i0 = Math.min(pointFrom[0], pointTo[0]) ;
-		int i1 = Math.max(pointFrom[0], pointTo[0])+1;
-		int j0 = Math.min(pointFrom[1], pointTo[1]);
-		int j1 = Math.max(pointFrom[1], pointTo[1])+1;
-		int[] points = {i0, i1, j0, j1};
-		return points;
-	}
-	
-	private int sumArray(int[] array) {
+
+	public int getLineSum(int[][] array, int x, int y, int x2, int y2) {
 		int sum = 0;
-		for (int i:array) {
-			sum += i;
+
+		int w = x2 - x;
+		int h = y2 - y;
+		int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+
+		if (w < 0)
+			dx1 = -1;
+		else if (w > 0)
+			dx1 = 1;
+		if (h < 0)
+			dy1 = -1;
+		else if (h > 0)
+			dy1 = 1;
+		if (w < 0)
+			dx2 = -1;
+		else if (w > 0)
+			dx2 = 1;
+
+		int longest = Math.abs(w);
+		int shortest = Math.abs(h);
+
+		if (!(longest > shortest)) {
+			longest = Math.abs(h);
+			shortest = Math.abs(w);
+			if (h < 0)
+				dy2 = -1;
+			else if (h > 0)
+				dy2 = 1;
+			dx2 = 0;
 		}
+
+		int numerator = longest >> 1;
+
+		for (int i = 0; i <= longest; i++) {
+			sum += array[x][y];
+			numerator += shortest;
+			if (!(numerator < longest)) {
+				numerator -= longest;
+				x += dx1;
+				y += dy1;
+			} else {
+				x += dx2;
+				y += dy2;
+			}
+		}
+
 		return sum;
-	}
-	
-	public int lineFunction(int i, double fraction, int constant) {
-		return (int)(Math.round(fraction*i)+constant);
 	}
 
 }
