@@ -1,5 +1,7 @@
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -286,5 +288,24 @@ public class LineDetectorTest {
 		
 		assertArrayEquals(expecteds, actuals);
 	}
-
+	
+	///////////////////
+	//Merge group tests
+	
+	@Test
+	public void test_merge_groups_1() {
+		int[] line1 = {0, 0, 2, 2, 2};
+		int[] line2 = {0, 0, 2, 2, 1};
+		int[] line3 = {10, 10, 20, 20, 10};
+		
+		ArrayList<int[]> lines = new ArrayList<int[]>();
+		lines.add(line3);
+		lines.add(line2);
+		lines.add(line1);
+		
+		int[] expecteds = {0, 0, 2, 2, 3};
+		int[] actuals = line.mergeGroup(lines).get(1);
+		
+		assertArrayEquals(expecteds, actuals);
+	}
 }

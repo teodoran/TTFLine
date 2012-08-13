@@ -36,6 +36,71 @@ public class LineDetector {
 		return new ArrayList<int[]>(new HashSet<int[]>(candidateLines));
 	}
 
+	public ArrayList<int[]> reduceCandidates(ArrayList<int[]> candidateLines) {
+		if (candidateLines.size() < 2) {
+			return candidateLines;
+		}
+		while (candidateLines.size() > 20) {
+			candidateLines = mergeLine(candidateLines);
+		}
+		while (candidateLines.size() > 2) {
+			candidateLines = mergeGroup(candidateLines);
+		}
+		return candidateLines;
+	}
+
+	public ArrayList<int[]> mergeGroup(ArrayList<int[]> candidateLines) {
+		int[] line1 = candidateLines.get(0);
+		int[] line2 = candidateLines.get(1);
+		int difference = getDifference(line1, line2);
+
+		for (int[] lineA : candidateLines) {
+			for (int[] lineB : candidateLines) {
+				if (lineA != lineB && difference >= getDifference(lineA, lineB)) {
+					difference = getDifference(lineA, lineB);
+					line1 = lineA;
+					line2 = lineB;
+				}
+			}
+		}
+		candidateLines.remove(line1);
+		candidateLines.remove(line2);
+		candidateLines.add(mergeLines(line1, line2));
+		return candidateLines;
+
+	}
+
+	public int getDifference(int[] line1, int[] line2) {
+		return getPointDifference(line1[0], line1[1], line1[2], line1[3])
+				+ getPointDifference(line2[0], line2[1], line2[2], line2[3]);
+	}
+
+	public int getPointDifference(int x1, int y1, int x2, int y2) {
+		float dx = x2 - x1;
+		float dy = y2 - y1;
+		return (int) (Math.pow(dx, 2.0) + Math.pow(dy, 2.0));
+	}
+
+	public int[] mergeLines(int[] line1, int[] line2) {
+		if (line1[4] > line2[4]) {
+			line1[4] += line2[4];
+			return line1;
+		}
+		line2[4] += line1[4];
+		return line2;
+	}
+
+	public ArrayList<int[]> mergeLine(ArrayList<int[]> candidateLines) {
+		int[] mergeLine = candidateLines.get(0);
+		for (int[] line : candidateLines) {
+			if (line[4] < mergeLine[4]) {
+				mergeLine = line;
+			}
+		}
+		candidateLines.remove(mergeLine);
+		return candidateLines;
+	}
+
 	public ArrayList<int[]> getCandidatesForSide(int[] edgePointFrom,
 			int[][] edgeArray, int width, int height, int threshold,
 			boolean doTop, boolean doRight, boolean doBottom, boolean doLeft) {
