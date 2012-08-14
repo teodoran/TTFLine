@@ -1,7 +1,6 @@
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -308,4 +307,63 @@ public class LineDetectorTest {
 		
 		assertArrayEquals(expecteds, actuals);
 	}
+	
+	///////////////////////////
+	//Inner Angle tests
+
+	@Test
+	public void test_innerAngle_1() {
+		int[] line1 = {1, 1, 2, 2};
+		int[] line2 = {1, 2, 2, 1};
+		
+		double expected = Math.PI/2;
+		double actual = line.innerAngle(line2, line1);
+		
+		assertEquals(expected, actual, 0);
+	}
+	
+	@Test
+	public void test_innerAngle_2() {
+		int[] line1 = {2, 2, 1, 1};
+		int[] line2 = {2, 1, 1, 2};
+		
+		double expected = Math.PI/2;
+		double actual = line.innerAngle(line2, line1);
+		
+		assertEquals(expected, actual, 0);
+	}
+	
+	@Test
+	public void test_innerAngle_3() {
+		int[] line1 = {1, 1, 4, 1};
+		int[] line2 = {1, 1, 4, 3};
+		
+		double expected = Math.atan(2f/3f);
+		double actual = line.innerAngle(line2, line1);
+		
+		assertEquals(expected, actual, 0.00005);
+	}
+	
+	@Test
+	public void test_innerAngle_4() {
+		int[] line1 = {4, 1, 1, 1};
+		int[] line2 = {1, 1, 4, 3};
+		
+		double expected = Math.atan(2f/3f);
+		double actual = line.innerAngle(line2, line1);
+		
+		assertEquals(expected, actual, 0.00005);
+	}
+	
+	@Test
+	public void test_innerAngle_5() {
+		int[] line1 = {4, 1, 1, 1};
+		int[] line2 = {4, 3, 1, 1};
+		
+		double expected = Math.atan(2f/3f);
+		double actual = line.innerAngle(line2, line1);
+		
+		assertEquals(expected, actual, 0.00005);
+	}
+	
 }
